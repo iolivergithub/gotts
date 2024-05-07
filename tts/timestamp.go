@@ -1,41 +1,24 @@
 package tts
 
-import(
-	"crypto/sha256"
-
-	"github.com/beevik/ntp"
-)
-
-func getTime() (string,error) {
-    time, err := ntp.Time("fi.pool.ntp.org")
-
-    return time.GoString(),err
-}
 
 func CallTTS(i string) (string,string,error) {
 
 	// Get the time
 
-	t,err := getTime()
+	t,err := GetTime()
 	if  err!=nil {
 		return "","",err
 	}
 
-	//so, concatenate the given hash i with the timestamp t
+	//and hash the concatenation of the incomming data and timestamp
 
-	c := i+t
-
-	//and hash it
-
-    h := sha256.New()
-    h.Write([]byte(c))
-    hs := h.Sum(nil)
+	h := MakeSHA256(i+t)
 
     // sign it
 
-    sig := "signature"
+    sig := Sign(h)
 
     // and return
 
-	return  string(hs),sig,nil
+	return  h,sig,nil
 }
